@@ -6,6 +6,7 @@ float position[2] = { 0, 0};
 float rotation = 0;
 
 int matrixSize = 3;
+float frustumSize = 10;
 
 GLfloat viewMatrix[16] = {
     1, 0, 0, 0,
@@ -27,31 +28,59 @@ void GLWidget::initializeGL()
 void GLWidget::resizeGL(int w, int h)
 {
     glViewport(0, 0, w, h);
-    glOrtho(-4, 4, -4, 4, 0, 10);
+
+    glOrtho(-frustumSize, frustumSize, -frustumSize, frustumSize, 0, 10);
+
+//    float aspect = w / h;
+//    glOrtho(frustumSize * aspect / -2,
+//            frustumSize * aspect / 2,
+//            frustumSize / -2,
+//            frustumSize / 2,
+//            0, 10);
 }
 
-void drawAxes(void)
+void drawGrid(void)
+{
+    glColor3f(0.8, 0.8, 0.8);
+    float size = frustumSize;
+    float step = 1;
+
+    float i;
+    for (i = 0; i < size; i+=step) {
+        glBegin(GL_LINES);
+            // Vertical
+            glVertex2f(i, -size); glVertex2f(i, size);
+            glVertex2f(-i, -size); glVertex2f(-i, size);
+
+            // Horizontal
+            glVertex2f(-size, i); glVertex2f(size, i);
+            glVertex2f(-size, -i); glVertex2f(size, -i);
+        glEnd();
+    }
+}
+
+void drawAxes(float color[3])
 {
     GLfloat zero[3] = {0,0,0};
-    GLfloat X[3] = {1,0,0}, Y[3] = {0,1,0}, Z[3] = {0,0,1};
     glPushMatrix();
-
-    glScalef(3, 3, 3);
-
-    glLineWidth(2.0);
-
-    glBegin(GL_LINES);
-    // X -red
     {
-        glColor3f(0,0,0);
-        glVertex3fv(zero);
-        glVertex3fv(X);
-    }
-    // Y - green
-    {
-        glColor3f(0,0,0);
-        glVertex3fv(zero);
-        glVertex3fv(Y);
+        glScalef(frustumSize, frustumSize, frustumSize);
+
+        glColor3fv(color);
+
+        glLineWidth(3);
+
+        glBegin(GL_LINES);
+        // X
+        {
+            glVertex3fv(zero);
+            glVertex2f(1, 0);
+        }
+        // Y
+        {
+            glVertex3fv(zero);
+            glVertex2f(0, 1);
+        }
     }
     glEnd();
 
@@ -117,7 +146,9 @@ void GLWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT);
 
-    drawAxes();
+    drawGrid();
+    float blackColor[3] = {0,0,0};
+    drawAxes(blackColor);
 
     glPushMatrix();
     {
@@ -141,6 +172,10 @@ void GLWidget::paintGL()
         }
         glEnd();
 
+        if (rotation != 0 || position[0] != 0 || position[1] != 0) {
+            float axisColor[3] = {0.257, 0.71, 0.388};
+            drawAxes(axisColor);
+        }
     }
     glPopMatrix();
 
@@ -148,7 +183,7 @@ void GLWidget::paintGL()
 //    {
 //        glLoadIdentity();
 
-////        glRotatef(10, 0, 0, 1);
+//        glRotatef(10, 0, 0, 1);
 
 //        float mat[16];
 //        glGetFloatv(GL_MODELVIEW_MATRIX, mat);
@@ -156,14 +191,12 @@ void GLWidget::paintGL()
 //    }
 //    glPopMatrix();
 
-//
-//    glColor3f(1, 1, 1);
-//    drawSpiral(2, 2);
-
 //    glBegin(GL_LINES);
-//        glColor3f(1, 0, 0); glVertex3f(-1, -1, 0);
-//        glColor3f(0, 1, 0); glVertex3f(0, 0, 0);
-//        glColor3f(0, 0, 1); glVertex3f(1, -1, 0);
+//        glColor3f(1, 0, 1);
+//        glVertex3f(0, 0, 0); glVertex3f(-1, 0, 0);
+//        glVertex3f(0, 0.2, 0); glVertex3f(-5, 0.2, 0);
+//        glVertex3f(0, 0.4, 0); glVertex3f(-9, 0.4, 0);
+//        glVertex3f(0, 0.6, 0); glVertex3f(-10, 0.6, 0);
 //    glEnd();
 }
 
