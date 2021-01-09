@@ -4,6 +4,10 @@
 #include <QMainWindow>
 #include <QSlider>
 #include <QHBoxLayout>
+#include <QBoxLayout>
+#include <QGroupBox>
+#include <QLabel>
+#include <QDoubleSpinBox>
 
 #include "glwidget.h"
 

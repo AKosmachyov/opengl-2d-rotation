@@ -9,16 +9,13 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    basicmesh.cpp \
     glwidget.cpp \
     main.cpp \
     mainwindow.cpp
 
 HEADERS += \
-    basicmesh.h \
     glwidget.h \
-    mainwindow.h \
-    mesh.h
+    mainwindow.h
 
 FORMS += \
     mainwindow.ui

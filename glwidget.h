@@ -15,9 +15,11 @@ protected:
     void paintGL();
 
 public slots:
-    void setXRotation(int angle);
-    void setYRotation(int angle);
-    void setZRotation(int angle);
+    void setRotation(double);
+    void setXScale(double);
+    void setYScale(double);
+    void setXTransform(double);
+    void setYTransform(double);
 };
 
 #endif // GLVIEW_HPP
