@@ -7,13 +7,13 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    float transformMin = 0;
+    float transformMin = -10;
     float transformMax = 10;
     float transformStep = 0.5;
 
-    float scaleMin = 1;
-    float scaleMax = 2;
-    float scaleStep = 0.1;
+    float scaleMin = 0.01;
+    float scaleMax = 10;
+    float scaleStep = 1;
 
     QWidget *widget = new QWidget;
     setCentralWidget(widget);

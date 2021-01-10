@@ -1,14 +1,15 @@
 #include "glwidget.h"
 #include <math.h>
+#include <QDebug>
 
 float scale[2] = { 1, 1};
 float position[2] = { 0, 0};
 float rotation = 0;
 
 int matrixSize = 3;
-float frustumSize = 10;
+float frustumSize = 10.0;
 
-GLfloat viewMatrix[16] = {
+GLfloat nodeMatrix[16] = {
     1, 0, 0, 0,
     0, 1, 0, 0,
     0, 0, 1, 0,
@@ -28,15 +29,21 @@ void GLWidget::initializeGL()
 void GLWidget::resizeGL(int w, int h)
 {
     glViewport(0, 0, w, h);
+    glLoadIdentity();
 
-    glOrtho(-frustumSize, frustumSize, -frustumSize, frustumSize, 0, 10);
-
-//    float aspect = w / h;
-//    glOrtho(frustumSize * aspect / -2,
-//            frustumSize * aspect / 2,
-//            frustumSize / -2,
-//            frustumSize / 2,
-//            0, 10);
+    float aspect = (float)w / h;
+    if (aspect >= 1)
+        glOrtho(-frustumSize * aspect,
+                frustumSize * aspect,
+                -frustumSize,
+                frustumSize,
+                1.0, -1.0);
+    else
+      glOrtho(-frustumSize,
+              frustumSize,
+              -frustumSize / aspect,
+              frustumSize / aspect,
+              1.0, -1.0);
 }
 
 void drawGrid(void)
@@ -68,7 +75,7 @@ void drawAxes(float color[3])
 
         glColor3fv(color);
 
-        glLineWidth(3);
+        glLineWidth(2);
 
         glBegin(GL_LINES);
         // X
@@ -87,6 +94,32 @@ void drawAxes(float color[3])
     glPopMatrix();
 }
 
+void drawArchimedeanSpiral(bool isLeftDirection)
+{
+    float fiStart = 0;
+    float fiEnd = 2.12 * M_PI * 2;
+    float steps = 100;
+    float b = 0.5;
+
+    float fiStep = (fiEnd - fiStart) / steps;
+    if (isLeftDirection) {
+        fiStep *= -1;
+    }
+
+    glColor3f(0, 0, 0);
+    GLenum mode = isLeftDirection ? GL_LINES : GL_LINE_STRIP;
+    glBegin(mode);
+    for (int i = 0; i < steps; i++)
+    {
+        float angle = fiStep * i;
+        float x = b * angle * cos(angle);
+        float y = b * angle * sin(angle);
+
+        glVertex2f(x, y);
+    }
+    glEnd();
+}
+
 void multiply(float mat1[3][3],
               float mat2[3][3],
               float res[3][3])
@@ -101,7 +134,7 @@ void multiply(float mat1[3][3],
     }
 }
 
-GLfloat * calculateViewMatrix(float rotation, float scale[2], float position[2])
+void calculateViewMatrix(float rotation, float scale[2], float position[2], GLfloat final[16])
 {
     float matrix[3][3] = {
         {1, 0, 0},
@@ -136,10 +169,10 @@ GLfloat * calculateViewMatrix(float rotation, float scale[2], float position[2])
     multiply(temp, translationMatrix, matrix);
 
     // column-major ordering https://www.khronos.org/registry/OpenGL-Refpages/gl2.1/xhtml/glLoadMatrix.xml
-    viewMatrix[0] = matrix[0][0]; viewMatrix[4] = matrix[0][1]; /* */ viewMatrix[12] = matrix[0][2];
-    viewMatrix[1] = matrix[1][0]; viewMatrix[5] = matrix[1][1]; /* */ viewMatrix[13] = matrix[1][2];
+    final[0] = matrix[0][0]; final[4] = matrix[0][1]; /* */ final[12] = matrix[0][2];
+    final[1] = matrix[1][0]; final[5] = matrix[1][1]; /* */ final[13] = matrix[1][2];
     //
-    viewMatrix[3] = matrix[2][0]; viewMatrix[7] = matrix[2][1]; /* */ viewMatrix[15] = matrix[2][2];
+    final[3] = matrix[2][0]; final[7] = matrix[2][1]; /* */ final[15] = matrix[2][2];
 }
 
 void GLWidget::paintGL()
@@ -147,30 +180,15 @@ void GLWidget::paintGL()
     glClear(GL_COLOR_BUFFER_BIT);
 
     drawGrid();
-    float blackColor[3] = {0,0,0};
-    drawAxes(blackColor);
+    float greyColor[3] = {0.52, 0.52, 0.52};
+    drawAxes(greyColor);
 
     glPushMatrix();
     {
-        glLoadMatrixf(viewMatrix);
+        glMultMatrixf(nodeMatrix);
 
-        // Space between the spirals
-        float a = 3, b = 2;
-
-        glColor3f(1, 0, 0);
-        glBegin(GL_LINE_STRIP);
-        for (int i = 0; i < 100; i++)
-        {
-            float angle = 0.1 * i;
-            float x = (a + b * angle) * cos(angle);
-            float y = (a + b * angle) * sin(angle);
-
-            float length = x * x + y * y;
-            float normX = x / length;
-            float normY = y / length;
-            glVertex3f(normX, normY, 0);
-        }
-        glEnd();
+        drawArchimedeanSpiral(false);
+        drawArchimedeanSpiral(true);
 
         if (rotation != 0 || position[0] != 0 || position[1] != 0) {
             float axisColor[3] = {0.257, 0.71, 0.388};
@@ -178,59 +196,61 @@ void GLWidget::paintGL()
         }
     }
     glPopMatrix();
-
-//    glPushMatrix();
-//    {
-//        glLoadIdentity();
-
-//        glRotatef(10, 0, 0, 1);
-
-//        float mat[16];
-//        glGetFloatv(GL_MODELVIEW_MATRIX, mat);
-//        int qwe = 1;
-//    }
-//    glPopMatrix();
-
-//    glBegin(GL_LINES);
-//        glColor3f(1, 0, 1);
-//        glVertex3f(0, 0, 0); glVertex3f(-1, 0, 0);
-//        glVertex3f(0, 0.2, 0); glVertex3f(-5, 0.2, 0);
-//        glVertex3f(0, 0.4, 0); glVertex3f(-9, 0.4, 0);
-//        glVertex3f(0, 0.6, 0); glVertex3f(-10, 0.6, 0);
-//    glEnd();
 }
 
 void GLWidget::setRotation(double angle)
 {
     rotation = angle;
-    calculateViewMatrix(rotation, scale, position);
-    updateGL();
+    updateMatrix();
 }
 
 void GLWidget::setXScale(double xScale)
 {
     scale[0] = xScale;
-    calculateViewMatrix(rotation, scale, position);
-    updateGL();
+    updateMatrix();
 }
 
 void GLWidget::setYScale(double yScale)
 {
     scale[1] = yScale;
-    calculateViewMatrix(rotation, scale, position);
-    updateGL();
+    updateMatrix();
 }
 
 void GLWidget::setXTransform(double xTransform)
 {
     position[0] = xTransform;
-    calculateViewMatrix(rotation, scale, position);
-    updateGL();
+    updateMatrix();
 }
 
 void GLWidget::setYTransform(double yTransform)
 {
     position[1] = yTransform;
-    calculateViewMatrix(rotation, scale, position);
+    updateMatrix();
+}
+
+void GLWidget::updateMatrix()
+{
+    calculateViewMatrix(rotation, scale, position, nodeMatrix);
     updateGL();
 }
+
+
+// Notes
+
+// Draw lines
+//    glPushMatrix();
+//    {
+//        glBegin(GL_LINES);
+//            glColor3f(1, 0, 1);
+//            glVertex3f(0, 0, 0); glVertex3f(-1, 0, 0);
+//            glVertex3f(0, 1, 0); glVertex3f(-5, 1, 0);
+//        glEnd();
+//    }
+//    glPopMatrix();
+
+// Copy current matrix
+// float mat[16];
+// glGetFloatv(GL_MODELVIEW_MATRIX, mat);
+
+// Replace current matrix
+// glLoadMatrixf(viewMatrix);
