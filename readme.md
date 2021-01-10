@@ -1,6 +1,6 @@
 # OpenGL 2D rotation
 
-![Origin](./media/origin.png)![Changed](./media/changed.png)
+<img width="400" src="./media/origin.png"> <img width="400" src="./media/changed.png">
 
 Educational project for transforming 2D objects using matrices.
 
