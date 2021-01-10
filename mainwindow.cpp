@@ -12,8 +12,8 @@ MainWindow::MainWindow(QWidget *parent)
     float transformStep = 0.5;
 
     float scaleMin = 0.01;
-    float scaleMax = 10;
-    float scaleStep = 1;
+    float scaleMax = 3;
+    float scaleStep = 0.2;
 
     QWidget *widget = new QWidget;
     setCentralWidget(widget);

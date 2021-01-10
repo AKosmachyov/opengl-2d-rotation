@@ -19,6 +19,8 @@ GLfloat nodeMatrix[16] = {
 GLWidget::GLWidget(QWidget *parent) :
     QGLWidget(parent)
 {
+    font = QFont();
+    font.setBold(true);
 }
 
 void GLWidget::initializeGL()
@@ -46,7 +48,7 @@ void GLWidget::resizeGL(int w, int h)
               1.0, -1.0);
 }
 
-void drawGrid(void)
+void GLWidget::drawGrid()
 {
     glColor3f(0.8, 0.8, 0.8);
     float size = frustumSize;
@@ -64,14 +66,18 @@ void drawGrid(void)
             glVertex2f(-size, -i); glVertex2f(size, -i);
         glEnd();
     }
+
+    glColor3f(0.4, 0.4, 0.4);
+    renderText(0.2, step * 2 , 0, "2", font);
+    renderText(step * 2, 0.2, 0, "2", font);
 }
 
-void drawAxes(float color[3])
+void GLWidget::drawAxes(float color[3])
 {
     GLfloat zero[3] = {0,0,0};
     glPushMatrix();
     {
-        glScalef(frustumSize, frustumSize, frustumSize);
+        glScalef(frustumSize, frustumSize, 0);
 
         glColor3fv(color);
 
@@ -88,9 +94,11 @@ void drawAxes(float color[3])
             glVertex3fv(zero);
             glVertex2f(0, 1);
         }
-    }
-    glEnd();
+        glEnd();
 
+        renderText(0.9, 0, 0, "X", font);
+        renderText(0, 0.9, 0, "Y", font);
+    }
     glPopMatrix();
 }
 

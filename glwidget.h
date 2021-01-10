@@ -2,10 +2,12 @@
 #define GLVIEW_HPP
 
 #include <QGLWidget>
+#include <QFont>
 
 class GLWidget : public QGLWidget
 {
     Q_OBJECT
+    QFont font;
 public:
     explicit GLWidget(QWidget *parent = 0);
 
@@ -14,6 +16,8 @@ protected:
     void resizeGL(int w, int h);
     void paintGL();
     void updateMatrix();
+    void drawGrid();
+    void drawAxes(float color[3]);
 
 public slots:
     void setRotation(double);
