@@ -165,8 +165,8 @@ void calculateViewMatrix(float rotation, float scale[2], float position[2], GLfl
         {0,        0,        1}
     };
 
-    multiply(scaleMatrix, rotationMatrix, temp);
-    multiply(temp, translationMatrix, matrix);
+    multiply(translationMatrix, rotationMatrix, temp);
+    multiply(temp, scaleMatrix, matrix);
 
     // column-major ordering https://www.khronos.org/registry/OpenGL-Refpages/gl2.1/xhtml/glLoadMatrix.xml
     final[0] = matrix[0][0]; final[4] = matrix[0][1]; /* */ final[12] = matrix[0][2];
