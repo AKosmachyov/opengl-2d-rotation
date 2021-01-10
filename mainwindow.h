@@ -2,9 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QSlider>
 #include <QHBoxLayout>
-#include <QBoxLayout>
 #include <QGroupBox>
 #include <QLabel>
 #include <QDoubleSpinBox>
@@ -26,10 +24,5 @@ public:
 private:
     Ui::MainWindow *ui;
     GLWidget *glWidget;
-    QSlider *xSlider;
-    QSlider *ySlider;
-    QSlider *zSlider;
-
-    QSlider *createSlider();
 };
 #endif // MAINWINDOW_H

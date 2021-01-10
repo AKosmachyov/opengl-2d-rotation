@@ -21,7 +21,7 @@ FORMS += \
     mainwindow.ui
 
 TRANSLATIONS += \
-    rotation-3d_en_US.ts
+    opengl-2d-rotation_en_US.ts
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
